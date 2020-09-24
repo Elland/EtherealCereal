@@ -65,8 +65,8 @@ public class EtherealCereal: NSObject {
         // This creates the private key inside a block, result is of internal type ResultType.
         // We just need to check if it's 0 to ensure that there were no errors.
         let count = privateKey.count
-        let result = privateKey.withUnsafeMutableBytes { mutableBytes in
-            SecRandomCopyBytes(kSecRandomDefault, count, mutableBytes)
+        let result = privateKey.withUnsafeMutableBytes { (pointer) -> Int32 in
+            SecRandomCopyBytes(kSecRandomDefault, count, pointer)
         }
 
         guard result == 0 else { fatalError("Failed to randomly generate and copy bytes for private key generation. SecRandomCopyBytes error code: (\(result)).") }
@@ -118,7 +118,7 @@ public class EtherealCereal: NSObject {
 }
 
 public extension Data {
-    public var hexadecimalString: String {
+    var hexadecimalString: String {
         return (self as NSData).hexadecimalString()
     }
 }
@@ -130,7 +130,7 @@ struct EtherealCerealRegex {
 }
 
 public extension String {
-    public var hexadecimalData: Data? {
+    var hexadecimalData: Data? {
         guard let match = EtherealCerealRegex.hexadecimalDataRegex.matches(in: self, range: NSMakeRange(0, self.count)).first
             else { return nil }
 
